@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Tabbed Browser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .tab-container {
+            display: flex;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+        }
+        .tab.active {
+            background-color: #ddd;
+        }
+        .tab i {
+            margin-left: 5px;
+            color: red;
+            cursor: pointer;
+        }
+        .content {
+            padding: 10px;
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        .tab-input {
+            width: 100%;
+            padding: 5px;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 400px;
+        }
+        #add-tab {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border-left: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="tab-container">
+    <div class="tab" id="add-tab"><i class="fas fa-plus"></i></div>
+</div>
+<div class="content-container">
+</div>
+
+<script>
+    const tabContainer = $('.tab-container');
+    const contentContainer = $('.content-container');
+    let tabCount = 0;
+
+    function createTab() {
+        tabCount++;
+        const tabId = `tab-${tabCount}`;
+        const contentId = `content-${tabCount}`;
+
+        const tab = $(`
+            <div class="tab" data-target="${contentId}">
+                Tab ${tabCount}
+                <i class="fas fa-times"></i>
+            </div>
+        `);
+        const content = $(`
+            <div class="content" id="${contentId}">
+                <input type="text" class="tab-input" placeholder="Enter URL and press Enter">
+                <iframe></iframe>
+            </div>
+        `);
+
+        tabContainer.append(tab);
+        contentContainer.append(content);
+
+        tab.on('click', () => {
+            $('.tab, .content').removeClass('active');
+            tab.addClass('active');
+            $(`#${contentId}`).addClass('active');
+        });
+
+        tab.find('i').on('click', (e) => {
+            e.stopPropagation();
+            const target = tab.data('target');
+            $(`#${target}`).remove();
+            tab.remove();
+        });
+
+        content.find('.tab-input').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const url = $(this).val();
+                if (url) {
+                    $(`#${contentId} iframe`).attr('src', url);
+                }
+            }
+        });
+
+        tab.click(); // Activate the newly created tab
+    }
+
+    $('#add-tab').on('click', createTab);
+
+    // Create the first tab by default
+    createTab();
+</script>
+
+</body>
+</html>
+
+
